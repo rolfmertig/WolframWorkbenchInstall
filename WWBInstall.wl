@@ -17,7 +17,7 @@
 
 
 (* ::Text:: *)
-(*Date: June 30th 2020*)
+(*Date: July 1th 2020*)
 
 
 (* ::Item:: *)
@@ -53,7 +53,7 @@
 
 $configuration = <|
   "EclipseMirror" -> "http://ftp.fau.de/eclipse/technology/epp/downloads/release/2020-06/R/"
-  , "MacOSX"  -> <| "SourceFile" -> "eclipse-java-2020-06-R-macosx-cocoa-x86_64.dmg"  , "EclipseFolder" -> "/Applications/Eclipse.app" |>
+  , "MacOSX"  -> <| "SourceFile" -> "eclipse-java-2020-06-R-macosx-cocoa-x86_64.dmg"  , "EclipseFolder" -> "/Applications/Eclipse2020-06.app" |> (* can be also just Eclipse.app *)
   , "Windows" -> <| "SourceFile" -> "eclipse-java-2020-06-R-win32-x86_64.zip"         , "EclipseFolder" ->  FileNameJoin[{$HomeDirectory, "eclipse2020-06"}] |>
   , "Unix"    -> <| "SourceFile" -> "eclipse-java-2020-06-R-linux-gtk-x86_64.tar.gz"  , "EclipseFolder" ->  FileNameJoin[{$HomeDirectory, "eclipse2020-06"}] |>
   , "DownloadFolder" :> $TemporaryDirectory (* FileNameJoin[{$HomeDirectory, "Downloads"}] *) (* if downloads should be persistent, use this setting instead of $TemporaryDirectory *)
@@ -184,7 +184,7 @@ $AdditionalPlugins = {
 
 
 (* ::Subsection:: *)
-(*The default setting is to only install the WWB pluigin*)
+(*The default setting is to only install the WWB plugin*)
 
 
 (* always install WWB *)
@@ -253,7 +253,7 @@ URLExistsQ[url_String] := JLink`JavaBlock @ Block[{openConnection, getResponseCo
 (*Based on: https://mathematica.stackexchange.com/a/177283/29*)
 
 
-(* A convenience function for downloading. Fall back to URLDOwnload if $Notebooks is False, otherwise print percentages on "stdout" *)
+(*A convenience function for downloading. Fall back to URLDOwnload if $Notebooks is False, otherwise print percentages on "stdout"*)
 AdvancedURLDownload[file_, target_, label_String:""] := Module[
   {manifest, taskProgress, taskFinished, startJob, monitor}
   , If[!URLExistsQ[file], logPrint["The URL ", file," is not reachable. Quitting."]; Quit[]]
@@ -305,7 +305,7 @@ AdvancedURLDownload[file_, target_, label_String:""] := Module[
 
 
 (* ::Text:: *)
-(*Install Eclipse according to settings in config. *)
+(*Install Eclipse according to settings in config ($configuration) *)
 
 
 EclipseInstall[config_Association:$configuration]:= Module[
@@ -348,7 +348,7 @@ EclipseInstall[config_Association:$configuration]:= Module[
 
 WolframWorkbenchInstall[config_Association, startAfterInstallation_:True] := Module[
   {
-    timeStart, downloadFolder, eclipseDir, eclipseSource, eclipseExe,  eclipseIni, downloadFile, iniFile
+    timeStart, downloadFolder, eclipseDir, eclipseExe,  eclipseIni 
   }
     , "(* get folders from config *)"
     ; timeStart = AbsoluteTime[];
@@ -376,7 +376,7 @@ WolframWorkbenchInstall[config_Association, startAfterInstallation_:True] := Mod
     ; If[$Notebooks =!= True, logPrint["Quitting now "]; Quit[]]
 ];
 
-(* need eclipsec.exe on Windows *)
+(*need eclipsec.exe on Windows*)
 getEclipsecExe[eclipseDir_String]:=
   FileNameJoin[
     { eclipseDir,
@@ -388,11 +388,11 @@ getEclipsecExe[eclipseDir_String]:=
     }
 ];
 
-(* the GUI eclipse executable *)
+(*the GUI eclipse executable*)
 getEclipseExe[eclipseDir_String]:=
   StringReplace[getEclipsecExe[eclipseDir], "eclipsec.exe" -> "eclipse.exe"];
 
-(* Make a copy of eclipse.ini (to eclipse.ini.orig) and modify eclipse.ini to use the Wolfram jvm and the predefined workspace from $configuration. *)
+(*Make a copy of eclipse.ini (to eclipse.ini.orig) and modify eclipse.ini to use the Wolfram jvm and the predefined workspace from $configuration*)
 modifyIniFile[iniFile_String?FileExistsQ, config_:$configuration] :=  Module[{javaDir, pathnameSeparatorFix}
   ,
   "(* modification of the eclipse.ini file may have to be changed in future Eclipse version *)"
@@ -458,4 +458,4 @@ installPlugin[asso_Association,  eclipseDir_String] := Module[{bundlesInfo, inst
 (*Run the installer*)
 
 
-WolframWorkbenchInstall[$configuration, True (* start after installation *)]
+WolframWorkbenchInstall[$configuration, True (* open Eclipse directly after the installation *)]
