@@ -204,7 +204,7 @@ $AdditionalPlugins = {
   ,
   <|
     "description" -> "FluentMark Editor; for further instructions and information see:  https://github.com/grosenberg/fluentmark"
-    , "repository" -> "https://marketplace.eclipse.org/content/fluentmark#group-screenshots"
+    , "repository" -> "https://www.certiv.net/updates"
     , "installIU" -> "net.certiv.fluentmark.feature.feature.group"
     |>
   ,
