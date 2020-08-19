@@ -1,64 +1,90 @@
 (* ::Package:: *)
 
 (* ::Title:: *)
-(*Automatic Wolfram Workbench installation and configuration*)
+(* Automatic Eclipse and Wolfram Workbench installation and configuration*)
 
 
 (* ::Abstract:: *)
-(*Multi-OS automatic Installation and configuration (dark theme, and more) of  Eclipse 2020-06 and the  Wolfram Workbench (WWB) plugin, plus eventually other plugins*)
+(* Multi-OS automatic installation and configuration (dark theme, and more) of Eclipse 2020-06 and the Wolfram Workbench (WWB) plugin, with potentially further plugins *)
+(* *)
+
+(* ::Installation:: *)
+
+(*
+Executing
+wolframscript -code '$InstallAdditionalPlugins=True; Import["https://wolfr.am/NHGLnZMa"]'
+or
+wolframscript -code 'Import["https://wolfr.am/NHGLnZMa"]'
+from Wolfram Engine
+
+or
+
+$InstallAdditionalPlugins=True; Import["https://wolfr.am/NHGLnZMa"]
+
+or
+
+Import["https://wolfr.am/NHGLnZMa"]
+
+from a Mathematica Notebook automatically downloads Eclipse2020-06,
+installs it to a folder Eclipse2020-06 (.app on macOS) and downloads, installs and configures Wolfram Workbench, an IDE plugin developed by Wolfram Research.
+
+https://wolf.am/NHGLnZMa is just an short URL to this script, i.e. :
+https://raw.githubusercontent.com/rolfmertig/WolframWorkbenchInstall/master/WWBInstall.wl
+
+*)
+
 
 
 (* ::Author:: *)
-(*Dr. Rolf Mertig,*)
+(* Dr. Rolf Mertig *)
 
 
 (* ::Affiliation:: *)
-(*GluonVision GmbH, Berlin, Germany  (http://www.gluonvision.com)*)
+(* GluonVision GmbH, Berlin, Germany *)
 
 
 (* ::Text:: *)
-(*Date: July 1th 2020*)
+(* Date: July 1th 2020 ; August 18th 2020 *)
 
 
 (* ::Item:: *)
-(*Run this script from wolframscript or the Mathematica Kernel or the notebook Wolfram Mathematica Front End from WIndows, macOS or Linux*)
+(* Wolfram Mathematica (or Wolfram Engine) 12.1 is tested *)
 
 
 (* ::Item:: *)
-(*Wolfram Mathematica (or Wolfram Engine) 12.1 is tested, Mathematica 12.0 should work*)
+(* Depending on your location please consider downloading this script first to your computer and change the value of EclipseMirror in $configuration *)
 
 
 (* ::Item:: *)
-(*Depending on your location please consider downloading this script first to your computer and change the value of EclipseMirror in $configuration*)
-
-
-(* ::Item:: *)
-(*You might also want to change the DownloadFolder or EclipseWorkspace settings*)
+(* You might also want to change the DownloadFolder or EclipseWorkspace settings *)
 
 
 (* ::Text:: *)
-(*Copyright (c) 2020 Dr. Rolf Mertig (rolfm@gluonvision.com)*)
-(*This script is licenced under the MIT license ( https://en.wikipedia.org/wiki/MIT_License )*)
-(*Further licenses relevant are https://www.wolfram.com/legal/terms/wolfram-engine.html and https://www.wolfram.com/legal/agreements/wolfram-mathematica/ and the license text mentioned in  https://support.wolfram.com/27221*)
-(**)
+(* Copyright (c) 2020 Dr. Rolf Mertig (rolfm@gluonvision.com) *)
+(* This script is licenced under the MIT license ( https://en.wikipedia.org/wiki/MIT_License ) *)
+(* Further licenses relevant are https://www.wolfram.com/legal/terms/wolfram-engine.html and https://www.wolfram.com/legal/agreements/wolfram-mathematica/ and the license text mentioned in  https://support.wolfram.com/27221 *)
 
 
 (* ::Section:: *)
-(*basic configuration*)
+(* Configuration, for Eclipse 2020-06 *)
 
 
 (* ::Subsection:: *)
-(*$configuration specifications:  Eclipse 2020-06 version, default workspace eclipse-workspace-2020-06 in $HomeDirectory*)
+(* $configuration specifications:  Eclipse 2020-06 version, default workspace eclipse-workspace-2020-06 in $HomeDirectory *)
+(* setting $configuration to your own specifications before running this script will be respected. *)
 
 
-$configuration = <|
-  "EclipseMirror" -> "http://ftp.fau.de/eclipse/technology/epp/downloads/release/2020-06/R/"
+If[!AssociationQ[$configuration]
+  ,
+  $configuration = <|
+    "EclipseMirror" -> "http://ftp.fau.de/eclipse/technology/epp/downloads/release/2020-06/R/"
   , "MacOSX"  -> <| "SourceFile" -> "eclipse-java-2020-06-R-macosx-cocoa-x86_64.dmg"  , "EclipseFolder" -> "/Applications/Eclipse2020-06.app" |> (* can be also just Eclipse.app *)
   , "Windows" -> <| "SourceFile" -> "eclipse-java-2020-06-R-win32-x86_64.zip"         , "EclipseFolder" ->  FileNameJoin[{$HomeDirectory, "eclipse2020-06"}] |>
   , "Unix"    -> <| "SourceFile" -> "eclipse-java-2020-06-R-linux-gtk-x86_64.tar.gz"  , "EclipseFolder" ->  FileNameJoin[{$HomeDirectory, "eclipse2020-06"}] |>
   , "DownloadFolder" :> $TemporaryDirectory (* FileNameJoin[{$HomeDirectory, "Downloads"}] *) (* if downloads should be persistent, use this setting instead of $TemporaryDirectory *)
   , "EclipseWorkspace" :> FileNameJoin[{$HomeDirectory, "eclipse-workspace-2020-06"}]
-|>;
+  |>
+];
 
 
 (* ::Section:: *)
@@ -170,16 +196,46 @@ setDefaultPreferences[config_:$configuration] :=
 
 
 $AdditionalPlugins = {
-  <| (* got Vim addicts *)
+  <| (* for Vim users *)
     "description" -> "Vrapper -- Vim-like editing in Eclipse"
     , "repository" -> "http://vrapper.sourceforge.net/update-site/unstable"
     , "installIU" -> "net.sourceforge.vrapper.feature.group"
   |>
   ,
+  <|
+    "description" -> "FluentMark Editor; for further instructions and information see:  https://github.com/grosenberg/fluentmark"
+    , "repository" -> "https://marketplace.eclipse.org/content/fluentmark#group-screenshots"
+    , "installIU" -> "net.certiv.fluentmark.feature.feature.group"
+    |>
+  ,
+  <| (* YAML editor *)
+   "description" -> "Yaml Editor"
+    , "repository" -> "https://dl.bintray.com/de-jcup/yamleditor"
+    , "installIU" -> "de.jcup.yamleditor.feature.group"
+  |>
+  ,
+  <| (* bash editor *)
+   "description" -> "A bash script editor"
+    , "repository" -> "https://dl.bintray.com/de-jcup/basheditor"
+    , "installIU" -> "de.jcup.basheditor.feature.group"
+  |>
+  
+  (*
+  ,
+  <| (* Spectrum Dark Theme *)
+   "description" -> "A dark theme with customizable project explorer font sizes ... "
+    , "repository" -> "https://raw.githubusercontent.com/AObuchow/Eclipse-Specturm-Theme/updatesite/updatesite"
+    , "installIU" -> "com.aobuchow.themes.spectrum.feature.feature.group"
+  |>
+  *)
+
+  (* This IntelliJ KeyMap plugin is interesting, but destroys the nice F3 behaviour (search definitions) of the WWB plugin
+  ,
   <| (* for users of IntelliJ *)
     "description" -> "IntelliJ KeyMap for Eclipse ( https://github.com/IntelliJIdeaKeymap4Eclipse/IntelliJIdeaKeymap4Eclipse )" , "repository" -> "https://dl.bintray.com/intellijideakeymap4eclipse/update-site"
     , "installIU" -> "com.github.intellijideakeymap4eclipse.feature.feature.group"
   |>
+  *)
 };
 
 
@@ -217,7 +273,7 @@ If[TrueQ[$InstallAdditionalPlugins]
 
 
 (* create the various .prefs file in the workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings folder: *)
-createPrefsFiles[workspaceLocation_String, prefsAsso_Association] := Module[{(*prefsDir*)}
+createPrefsFiles[workspaceLocation_String, prefsAsso_Association] := Module[{prefsDir}
   , "(* create prefs files in .metadata of the specificed workspace location *)"
   ; prefsDir = FileNameJoin[{workspaceLocation, ".metadata", ".plugins", "org.eclipse.core.runtime", ".settings"}]
   ; logPrint["Generating preferences in prefsDir = ", prefsDir]
