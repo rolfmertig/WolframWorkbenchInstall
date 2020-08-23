@@ -44,7 +44,7 @@ https://raw.githubusercontent.com/rolfmertig/WolframWorkbenchInstall/master/WWBI
 
 
 (* ::Text:: *)
-(* Date: July 1th 2020 ; August 18th 2020 *)
+(* Date: August 23rd 2020 *)
 
 
 (* ::Item:: *)
@@ -387,12 +387,13 @@ EclipseInstall[config_Association:$configuration]:= Module[
         mountPoint = StringTrim @ Last @ StringSplit[#, "\t"]& @ bashRun["hdiutil attach " <> dFile <> " -nobrowse | grep /Volumes/Eclipse"]
         ;	tmp = FileNames["*.app", mountPoint] /. {a_String} :> a
       ,
-        ExtractArchive[dFile, tmpDir = CreateDirectory[]] (* this creates an eclipse folder in the directory created by CreateDirectory *)
+        ExtractArchive[dFile, tmpDir = eclipseDir <> "T"]
         ; tmp = FileNames["eclipse", tmpDir] /. {d_String} :> d
     ]
   ; If[!DirectoryQ[tmp], logPrint["creating ",tmp," failed!"]; Return[$Failed, Module]]
-  ; eDir = RenameDirectory[tmp, eclipseDir]
+  ; eDir = RenameDirectory[FileNameJoin[{tmpDir, "eclipse"}], eclipseDir]
   ; If[eDir === $Failed, CopyDirectory[tmp, eclipseDir]]
+  ; Quiet @ DeleteDirectory["eclipseDir" <> "T"]
   ; If[DirectoryQ[eclipseDir], logPrint["Installed Eclipse into ", eclipseDir]; eclipseDir,$Failed]
 ];
 
